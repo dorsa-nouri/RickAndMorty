@@ -1,6 +1,6 @@
 # Rick and Morty Explorer
 
-**Live demo:** [rick-and-morty-explorer-rho.vercel.app](https://rick-and-morty-explorer-rho.vercel.app/)
+**Live demo:** [rick-and-morty-explorer-rho.vercel.app](https://myrickandmorty.vercel.app)
 
 ![Rick and Morty logo](public/images/rickAndMortyLogo.webp)
 
