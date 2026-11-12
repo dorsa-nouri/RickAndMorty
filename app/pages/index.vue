@@ -77,7 +77,7 @@ const handleClear = () => {
 </script>
 
 <template>
-  <div class="min-h-screen overflow-hidden text-white">
+  <div class="min-h-screen text-white">
     <AppHeader :hide-glow-on-mobile="true">
       <template #search>
         <CharacterSearch
@@ -103,7 +103,11 @@ const handleClear = () => {
         <!-- empty state -->
         <EmptyState v-else-if="data && data.results.length === 0" />
 
-        <CharacterGrid v-else-if="data" :characters="data.results" />
+        <CharacterGrid
+          v-else-if="data"
+          :characters="data.results"
+          :key="`${query.page}-${query.name}`"
+        />
       </section>
       <div>
         <CharacterPagination

@@ -10,17 +10,15 @@ defineProps<{
 <template>
   <NuxtLink
     :to="`/characters/${character.id}`"
-    class="block overflow-hidden rounded-[16px] border border-transparent transition-colors duration-200 hover:border-[#404244]"
+    class="block overflow-clip rounded-[16px] border border-transparent transition-colors duration-200 hover:border-[#404244]"
   >
     <img
       :src="character.image"
       :alt="character.name"
       width="300"
       height="300"
-      loading="lazy"
       class="mx-auto aspect-square w-full max-w-[352px] rounded-[8px] object-cover p-4"
     />
-
     <div class="mb-2 px-4 text-left">
       <h2 class="mb-2 text-lg font-bold text-white">
         {{ character.name }}
