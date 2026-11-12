@@ -46,7 +46,7 @@ npm run preview
 - pass {signal} in [getCharacters](app/composables/useCharacters.ts) the new call aborts the previous one, and $fetch now honors that.
 - **Search:** The search input is debounced with [VueUse](https://vueuse.org/).
 - **Search feedback:** Search results have dedicated error and empty state components.
-- **Errors:** 404, 429 and 500 errors are handled by a separate error page.
+- **Errors:** 404, 429 and 500 errors are handled by a separate error page. The api has a undocumented rate limit. After fetching multiple characters it is possible it return 429 error.
 - **Loading:** Skeleton placeholders ([Loading.vue](app/components/generals/Loading.vue)) are shown while data loads.
 - **Shared header:** [AppHeader](app/components/generals/AppHeader.vue) uses two `<slot>`s because the home and detail pages share the same header (gradient background and logo placement). The home page passes the search component into one slot, and the detail page passes the character details (image, title, status) into the other.
 - **API:** The [data types](app/types/character.ts) and [API client](app/services/character.service.ts) are based on the [official API documentation](https://rickandmortyapi.com/documentation).
