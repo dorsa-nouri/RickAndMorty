@@ -9,17 +9,20 @@ const props = defineProps<{
     data?: {
       statusMessage?: string;
       message?: string;
+      id?: string;
     };
   };
 }>();
 
-const statusCode = computed(() => props.error.statusCode || 500);
+const statusCode = computed(() => props.error.statusCode || 404);
 
 const isNotFound = computed(() => statusCode.value === 404);
 
 const title = computed(() => {
   if (isNotFound.value) return "Wrong Dimension!";
   if (statusCode.value === 403) return "Access Denied!";
+  if (statusCode.value === 429)
+    return "Too Many Request ! Try again in a few secounds ...";
   if (statusCode.value >= 500) return "Something Went Wrong!";
   return "Oops! Something Happened";
 });
@@ -32,6 +35,9 @@ const description = computed(() => {
   if (statusCode.value === 403) {
     return "You don't have permission to enter this dimension.";
   }
+  if (statusCode.value === 429) {
+    return "Server is in wrong dimension ...";
+  }
 
   if (statusCode.value >= 500) {
     return "Our portal is having a little trouble. Please try again in a moment.";
@@ -42,6 +48,11 @@ const description = computed(() => {
 
 const clearErrorAndGoHome = async () => {
   await clearError({ redirect: "/" });
+};
+
+const retry = async () => {
+  await clearError();
+  await navigateTo(`/characters/${props.error.data?.id}`);
 };
 </script>
 
@@ -104,7 +115,15 @@ const clearErrorAndGoHome = async () => {
         {{ description }}
       </p>
 
-      <div class="flex flex-col justify-center gap-3 sm:flex-row">
+      <div class="flex flex-row justify-center gap-3 sm:flex-row">
+        <button
+          v-if="error.statusCode === 500 || error.statusCode === 429"
+          type="button"
+          class="rounded-lg mr-5 bg-brand-lime px-6 py-3 text-sm font-bold text-brand-gray transition hover:bg-brand-lime/80 focus:outline-none focus:ring-2 focus:ring-brand-lime focus:ring-offset-2 focus:ring-offset-brand-gray"
+          @click="retry"
+        >
+          Retry
+        </button>
         <button
           type="button"
           class="rounded-lg bg-brand-lime px-6 py-3 text-sm font-bold text-brand-gray transition hover:bg-brand-lime/80 focus:outline-none focus:ring-2 focus:ring-brand-lime focus:ring-offset-2 focus:ring-offset-brand-gray"

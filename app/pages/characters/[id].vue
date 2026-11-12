@@ -10,9 +10,15 @@ const id = computed(() => String(route.params.id));
 
 const { getCharacter } = useCharacters();
 
-const { data: character, pending, error } = await getCharacter(id.value);
+const {
+  data: character,
+  pending,
+  error,
+  refresh,
+} = await getCharacter(id.value);
 
 if (error.value || !character.value) {
+  console.log(error.value?.status);
   if (error.value?.status === 404) {
     throw createError({
       statusCode: 404,
@@ -22,8 +28,9 @@ if (error.value || !character.value) {
   }
 
   throw createError({
-    statusCode: 500,
-    statusMessage: "Server is not Awake",
+    statusCode: 429,
+    statusMessage: "Too Many Request !",
+    data: { id: id.value },
     fatal: true,
   });
 }

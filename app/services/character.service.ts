@@ -37,7 +37,7 @@ export const useCharacterService = () => {
           results: [],
         };
       }
-
+      console.log("error from service", error);
       throw error;
     }
   };

@@ -24,7 +24,7 @@ const query = computed(() => {
   };
 });
 
-const { data, pending, error } = await getCharacters(query);
+const { data, pending, error, refresh } = await getCharacters(query);
 
 const updateQuery = async (page: number, name: string, replace = false) => {
   const queryParams = {
@@ -59,16 +59,30 @@ const handlePageChange = (page: number) => {
 const errorMessage = computed(() => {
   const statusCode = error.value?.status;
 
+  console.log("Status code:", statusCode , typeof statusCode);
+
   if (statusCode === 404) {
     return "The character you are looking for could not be found.";
   }
 
-  if (statusCode && statusCode >= 500) {
+  if (statusCode === 429) {
+    return "Too Many Requests to Server. Wait a few seconds, then press the Try Again button.";
+  }
+
+  if (statusCode !== undefined && statusCode >= 500) {
     return "Server error. Please try again later.";
+  }
+
+  if (statusCode !== undefined && statusCode >= 400) {
+    return "A request error occurred. Please try again.";
   }
 
   return "Something went wrong. Check your connection and try again.";
 });
+
+const handleTryAgain = async () => {
+  await refresh();
+};
 
 const handleClear = () => {
   handleSearch("");
@@ -96,8 +110,10 @@ const handleClear = () => {
         <!-- Error state -->
         <ErrorState
           v-else-if="error"
+          :status-code="error.status|| 500"
           :message="errorMessage"
           :loading="pending"
+          @retry="handleTryAgain"
           @clear="handleClear"
         />
         <!-- empty state -->
