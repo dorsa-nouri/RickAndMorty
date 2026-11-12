@@ -32,6 +32,11 @@ const visiblePages = computed(() => {
 const goToPage = (page: number) => {
   if (page < 1 || page > props.totalPages || page === props.page) return;
   emit("update:page", page);
+
+    window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
 };
 </script>
 
