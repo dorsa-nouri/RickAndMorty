@@ -65,6 +65,7 @@ const clearErrorAndGoHome = async () => {
         to="/"
         aria-label="Rick and Morty home"
         class="mb-10 inline-block"
+        @click.prevent="clearErrorAndGoHome"
       >
         <img
           src="/images/rickAndMortyLogo.webp"

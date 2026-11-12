@@ -6,10 +6,12 @@ export const useCharacters = () => {
 
   const getCharacters = (query: Ref<{ page: number; name: string }>) => {
     return useAsyncData(
-      computed(
-        () => `characters-page-${query.value.page}-name-${query.value.name}`,
-      ),
-      () => service.getCharacters(query.value.page, query.value.name),
+      "characters",
+      (_nuxtApp, { signal }) =>
+        service.getCharacters(query.value.page, query.value.name, signal),
+      {
+        watch: [query],
+      },
     );
   };
 

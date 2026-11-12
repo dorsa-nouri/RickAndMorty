@@ -13,18 +13,19 @@ const { getCharacter } = useCharacters();
 const { data: character, pending, error } = await getCharacter(id.value);
 
 if (error.value || !character.value) {
-  if (error.value?.status === 404)
+  if (error.value?.status === 404) {
     throw createError({
       statusCode: 404,
       statusMessage: "Character not found",
       fatal: true,
     });
-  else
-    throw createError({
-      statusCode: 500,
-      statusMessage: "Server is not Awake",
-      fatal: true,
-    });
+  }
+
+  throw createError({
+    statusCode: 500,
+    statusMessage: "Server is not Awake",
+    fatal: true,
+  });
 }
 </script>
 

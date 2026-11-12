@@ -1,15 +1,46 @@
-import type { Character, CharacterResponse, Episode ,Location } from "~/types/character";
+import type {
+  Character,
+  CharacterResponse,
+  Episode,
+  Location,
+} from "~/types/character";
+
+const isNotFound = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "statusCode" in error &&
+  (error as { statusCode?: number }).statusCode === 404;
 
 export const useCharacterService = () => {
   const config = useRuntimeConfig();
 
-  const getCharacters = (page = 1, name = "") =>
-    $fetch<CharacterResponse>(`${config.public.apiBase}/character`, {
-      query: {
-        page,
-        ...(name.trim() ? { name: name.trim() } : {}),
-      },
-    });
+  const getCharacters = async (
+    page = 1,
+    name = "",
+    signal?: AbortSignal,
+  ): Promise<CharacterResponse> => {
+    try {
+      return await $fetch<CharacterResponse>(
+        `${config.public.apiBase}/character`,
+        {
+          signal,
+          query: {
+            page,
+            ...(name.trim() ? { name: name.trim() } : {}),
+          },
+        },
+      );
+    } catch (error) {
+      if (isNotFound(error)) {
+        return {
+          info: { count: 0, pages: 0, next: null, prev: null },
+          results: [],
+        };
+      }
+
+      throw error;
+    }
+  };
 
   const getCharacterById = (id: string | number) =>
     $fetch<Character>(`${config.public.apiBase}/character/${id}`);

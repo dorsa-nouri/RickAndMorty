@@ -8,6 +8,7 @@ import CharacterGrid from "~/components/characters/CharacterGrid.vue";
 import CharacterPagination from "~/components/characters/CharacterPagination.vue";
 import EmptyState from "~/components/generals/EmptyState.vue";
 import ErrorState from "~/components/generals/ErrorState.vue";
+import { isNavigationFailure } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -23,17 +24,22 @@ const query = computed(() => {
   };
 });
 
-const { data, pending, error, refresh } = await getCharacters(query);
+const { data, pending, error } = await getCharacters(query);
 
-const updateQuery = (page: number, name: string, replace = false) => {
+const updateQuery = async (page: number, name: string, replace = false) => {
   const queryParams = {
     ...(name ? { name } : {}),
     ...(page > 1 ? { page: String(page) } : {}),
   };
 
-  return (replace ? router.replace : router.push)({
-    query: queryParams,
-  });
+  try {
+    await (replace ? router.replace : router.push)({
+      query: queryParams,
+    });
+  } catch (error) {
+    if (isNavigationFailure(error)) return;
+    throw error;
+  }
 };
 
 const handleSearch = (value: string) => {
@@ -54,19 +60,16 @@ const errorMessage = computed(() => {
   const statusCode = error.value?.status;
 
   if (statusCode === 404) {
-    return "The Character you are looking for could not be found.";
+    return "The character you are looking for could not be found.";
   }
 
-  if (statusCode && statusCode >= 420) {
+  if (statusCode && statusCode >= 500) {
     return "Server error. Please try again later.";
   }
 
   return "Something went wrong. Check your connection and try again.";
 });
 
-const handleTryAgain = async () => {
-  await refresh();
-};
 const handleClear = () => {
   handleSearch("");
   searchResetKey.value++;
@@ -95,7 +98,6 @@ const handleClear = () => {
           v-else-if="error"
           :message="errorMessage"
           :loading="pending"
-          @retry="handleTryAgain"
           @clear="handleClear"
         />
         <!-- empty state -->

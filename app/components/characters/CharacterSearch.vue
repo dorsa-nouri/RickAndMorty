@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeUnmount } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps<{
@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const search = ref(props.initialValue ?? "");
+const isFocused = ref(false);
 
 const debouncedSearch = useDebounceFn(() => {
   emit("search", search.value.trim());
@@ -26,9 +27,12 @@ const handleSearch = () => {
   debouncedSearch.cancel();
   emit("search", search.value.trim());
 };
+
 watch(
   () => props.initialValue,
   (value) => {
+    if (isFocused.value) return;
+
     search.value = value ?? "";
     debouncedSearch.cancel();
   },
@@ -58,6 +62,8 @@ onBeforeUnmount(() => debouncedSearch.cancel());
       autocomplete="off"
       placeholder="Search for characters..."
       class="h-8 min-w-1 flex-1 rounded-sm border border-transparent bg-brand-light-gray px-3 text-xs text-white outline-none transition-colors placeholder:text-gray-300 focus:border-brand-lime"
+      @focus="isFocused = true"
+      @blur="isFocused = false"
       @input="handleInput"
     />
 
